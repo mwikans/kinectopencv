@@ -36,7 +36,7 @@ class findFaceGetPulse(object):
         for (x,y,w,h) in faces:
             frame = cv2.rectangle(frame,(x+30,y+30),(x+w-30,y+h-30),(255,0,0),0)  
             roi_color = frame[y+30:y+h-30, x+30:x+w-30]
-        return frame
+        return roi_color
     
     def run(self):
         #self.frame_out = self.frame_in.copy()
