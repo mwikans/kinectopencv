@@ -1,14 +1,15 @@
 from lib.kinectopencv import KinectRuntime
-from lib.interface import plotXY, imshow, waitKey, destroyWindow
+from lib.interface import plot_histogram, imshow, waitKey, destroyWindow
 from lib.imageprocessing import findFaceGetPulse
 import cv2
 import numpy as np
 import sys
+import time
 
 class getPulseApp(object):
     def __init__(self):
         self.cameras = []
-        self.selected_cam = 1
+        self.selected_cam = 0
         for i in range(3):
             camera = KinectRuntime(camera=i)  # first camera by default
             if camera.valid or not len(self.cameras):
@@ -18,6 +19,8 @@ class getPulseApp(object):
 
         self.w, self.h = 0, 0
         self.pressed = 0
+        
+        self.fileOutput = open("example.csv","w")
 
         '''
         Containerized analysis of recieved image frames (an openMDAO assembly)
@@ -32,12 +35,17 @@ class getPulseApp(object):
         '''
         self.image_processing = findFaceGetPulse()
 
+        # Init parameters for the cardiac data plot
+        self.bpm_plot = False
+        self.plot_title = "Data display - raw signal (top) and PSD (bottom)"
+        
+        self.save_data = False
         # Maps keystrokes to specified methods
         #(A GUI window must have focus for these to work)
-        #self.key_controls = {"s": self.toggle_search,
+        self.key_controls = {"s": self.toggle_search,
         #                     "d": self.toggle_display_plot,
         #                     "c": self.toggle_cam,
-        #                     "f": self.write_csv}
+                             "f": self.write_csv}
     #    self.cameras = []
     #    self.selected_cam = 0
     #    for i in range(camera-)
@@ -48,6 +56,42 @@ class getPulseApp(object):
     #        destroyWindow(self.plot_title)
     #        self.selected_cam += 1
     #        self.selected_cam = self.selected_cam % len(self.cameras)
+    
+    def write_csv(self):
+        """
+        Writes current data to a csv file
+        """
+        sec = self.image_processing.fps / 30
+        
+        L = ["%.3f" % (sec), " ", "%.3f" % self.image_processing.averaging, "\n"]
+        self.fileOutput.writelines(L)
+        
+        #fn = "Webcam-pulse" + str(datetime.datetime.now())
+        #fn = fn.replace(":", "_").replace(".", "_")
+        
+        #info = {
+        #    "x_value": "%.3f" % (sec),
+        #    "y_value": "%.3f" % self.image_processing.averaging,
+        #}
+        
+        #data = np.vstack((self.processor.times, self.processor.samples)).T
+        #np.savetxt(fn + ".csv", data, delimiter=',')
+        #print("Writing csv")
+        print("%.3f" % (sec), "%.3f" % self.image_processing.averaging)
+
+    def toggle_search(self):
+        """
+        Toggles a motion lock on the processor's face detection component.
+
+        Locking the forehead location in place significantly improves
+        data quality, once a forehead has been sucessfully isolated.
+        """
+        #state = self.processor.find_faces.toggle()
+        state = self.processor.find_faces_toggle()
+        print("face detection lock =", not state)
+     
+    def make_histogram_plot(self, subface_frame):
+        plot_histogram(subface_frame)
 
     def key_handler(self):
         """
@@ -66,9 +110,9 @@ class getPulseApp(object):
             #    self.serial.close()
             sys.exit()
 
-        #for key in self.key_controls.keys():
-        #    if chr(self.pressed) == key:
-        #        self.key_controls[key]()
+        for key in self.key_controls.keys():
+            if chr(self.pressed) == key:
+                self.key_controls[key]()
 
     def main_loop(self):
         frame = self.cameras[self.selected_cam].get_frame()
@@ -80,13 +124,25 @@ class getPulseApp(object):
         # process the image frame to perform all needed analysis
         #self.processor.run(self.selected_cam)
         # collect the output frame for display
-        output_frame = self.image_processing.get_faces()
+        #output_frame = self.image_processing.frame_out
+        
+        forehead = self.image_processing.forehead_
+        
         tes = self.image_processing.run()
-
-        imshow(" ", frame)
-        imshow("Input", output_frame)
-        imshow("123", tes)
-
+        
+        self.make_histogram_plot(forehead)
+        #tes = self.image_processing.face_detection()
+        #imshow("Input", frame)
+        #imshow("Interface", self.image_processing.frame_out)
+        #imshow("Gray", output_gray)
+        #imshow("Forehead", forehead)
+        #print(forehead)
+        #print(self.image_processing.forehead_)
+        #print(self.image_processing.averaging)
+        #print(self.image_processing.green_forehead)
+        
+        self.write_csv()
+                
         self.key_handler()
 
 if __name__ == "__main__":
