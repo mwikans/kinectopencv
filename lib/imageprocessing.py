@@ -116,7 +116,7 @@ class findFaceGetPulse(object):
         #tes = self.face_detection()    
         #self.frame_out = self.frame_in.copy()
         self.frame_out = cv2.applyColorMap(self.frame_in.copy(), cv2.COLORMAP_JET)
-        self.gray = cv2.equalizeHist(cv2.cvtColor(self.frame_in,
+        self.gray = cv2.equalizeHist(cv2.cvtColor(self.frame_in.copy(),
                                                   cv2.COLOR_BGR2GRAY))
         
         col = (100, 255, 100)
@@ -154,7 +154,7 @@ class findFaceGetPulse(object):
             self.forehead_ = self.RGB2GREEN(self.get_subface(forehead1))
             #self.forehead_ = self.downscale_img(self.forehead_)
             #self.green_forehead = self.forehead_[:, :, 1]
-            self.forehead_ = self.downscale_img(self.forehead_)
+            self.forehead_ = cv2.applyColorMap(self.downscale_img(self.forehead_), cv2.COLORMAP_JET)
             self.averaging = self.get_subface_averaging(self.forehead_)
             self.fps += 1
         

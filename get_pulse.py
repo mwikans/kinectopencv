@@ -20,7 +20,7 @@ class getPulseApp(object):
         self.w, self.h = 0, 0
         self.pressed = 0
         
-        self.fileOutput = open("example.csv","w")
+        self.fileOutput = open("time_series_frame.csv","w")
 
         '''
         Containerized analysis of recieved image frames (an openMDAO assembly)
@@ -45,7 +45,7 @@ class getPulseApp(object):
         self.key_controls = {"s": self.toggle_search,
         #                     "d": self.toggle_display_plot,
         #                     "c": self.toggle_cam,
-                             "f": self.write_csv}
+                             "f": self.toggle_write_csv}
     #    self.cameras = []
     #    self.selected_cam = 0
     #    for i in range(camera-)
@@ -89,7 +89,18 @@ class getPulseApp(object):
         #state = self.processor.find_faces.toggle()
         state = self.processor.find_faces_toggle()
         print("face detection lock =", not state)
-     
+    
+    def toggle_write_csv(self):
+        """
+        Toggle to save the data to csv file.
+        """
+        if self.save_data:
+            print("Saving frame data buffer finish")
+            self.save_data = False
+        else:
+            print("Saving frame data buffer start")
+            self.save_data = True
+    
     def make_histogram_plot(self, subface_frame):
         plot_histogram(subface_frame)
 
@@ -124,7 +135,8 @@ class getPulseApp(object):
         # process the image frame to perform all needed analysis
         #self.processor.run(self.selected_cam)
         # collect the output frame for display
-        #output_frame = self.image_processing.frame_out
+        output_frame = self.image_processing.frame_out
+        output_gray = self.image_processing.gray
         
         forehead = self.image_processing.forehead_
         
@@ -133,15 +145,16 @@ class getPulseApp(object):
         self.make_histogram_plot(forehead)
         #tes = self.image_processing.face_detection()
         #imshow("Input", frame)
-        #imshow("Interface", self.image_processing.frame_out)
-        #imshow("Gray", output_gray)
+        imshow("Interface", output_frame)
+        imshow("Gray", output_gray)
         #imshow("Forehead", forehead)
         #print(forehead)
         #print(self.image_processing.forehead_)
         #print(self.image_processing.averaging)
         #print(self.image_processing.green_forehead)
         
-        self.write_csv()
+        if self.save_data:
+            self.write_csv()
                 
         self.key_handler()
 
