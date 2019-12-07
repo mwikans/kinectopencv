@@ -1,6 +1,7 @@
 from lib.kinectopencv import KinectRuntime
 from lib.interface import plot_histogram, imshow, waitKey, destroyWindow
 from lib.imageprocessing import findFaceGetPulse
+from lib.filter_bp import plotFilter
 import cv2
 import numpy as np
 import sys
@@ -20,8 +21,7 @@ class getPulseApp(object):
         self.w, self.h = 0, 0
         self.pressed = 0
         
-        self.fileOutput = open("time_series_frame.csv","w")
-
+        self.fileOutput = []
         '''
         Containerized analysis of recieved image frames (an openMDAO assembly)
         is defined next.
@@ -39,13 +39,16 @@ class getPulseApp(object):
         self.bpm_plot = False
         self.plot_title = "Data display - raw signal (top) and PSD (bottom)"
         
+        self.bandpass_filter = plotFilter()
+        
         self.save_data = False
         # Maps keystrokes to specified methods
         #(A GUI window must have focus for these to work)
         self.key_controls = {"s": self.toggle_search,
         #                     "d": self.toggle_display_plot,
         #                     "c": self.toggle_cam,
-                             "f": self.toggle_write_csv}
+                             "f": self.toggle_write_csv,
+                             "m": self.toggle_matplot}
     #    self.cameras = []
     #    self.selected_cam = 0
     #    for i in range(camera-)
@@ -97,13 +100,24 @@ class getPulseApp(object):
         if self.save_data:
             print("Saving frame data buffer finish")
             self.save_data = False
+            self.fileOutput.close()
         else:
             print("Saving frame data buffer start")
+            self.fileOutput = open("_time_series_frame.csv","w")
             self.save_data = True
     
     def make_histogram_plot(self, subface_frame):
         plot_histogram(subface_frame)
 
+    def toggle_matplot(self):
+        """
+        Toggle to show the time series signal.
+        """
+        if self.bpm_plot:
+            self.bpm_plot = False
+        else:
+            self.bpm_plot = True
+    
     def key_handler(self):
         """
         Handle keystrokes, as set at the bottom of __init__()
@@ -136,18 +150,20 @@ class getPulseApp(object):
         #self.processor.run(self.selected_cam)
         # collect the output frame for display
         output_frame = self.image_processing.frame_out
+        output_jetmap = self.image_processing.frame_jetmap
         output_gray = self.image_processing.gray
         
         forehead = self.image_processing.forehead_
         
         tes = self.image_processing.run()
         
-        self.make_histogram_plot(forehead)
+        #self.make_histogram_plot(forehead)
         #tes = self.image_processing.face_detection()
         #imshow("Input", frame)
         imshow("Interface", output_frame)
+        imshow("Jetmap", output_jetmap)
         imshow("Gray", output_gray)
-        #imshow("Forehead", forehead)
+        imshow("Forehead", forehead)
         #print(forehead)
         #print(self.image_processing.forehead_)
         #print(self.image_processing.averaging)
@@ -155,6 +171,11 @@ class getPulseApp(object):
         
         if self.save_data:
             self.write_csv()
+            
+        if self.bpm_plot:
+            if self.save_data:
+                self.save_data = False
+            self.bandpass_filter.run()
                 
         self.key_handler()
 

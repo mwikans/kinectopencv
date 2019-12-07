@@ -24,27 +24,3 @@ class KinectRuntime(object):
 
     def release(self):
         self.cam.release()
-
-        '''
-        while True:
-            # Capture frame-by-frame
-
-            green_image = frame.copy()
-            green_image[:,:,0] = 0
-            green_image[:,:,2] = 0
-
-            # Our operations on the frame come here
-            gray = frame#cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            _image = cv2.applyColorMap(green_image, cv2.COLORMAP_JET)
-
-            # Display the resulting frame
-            cv2.imshow('frame',gray)
-            cv2.imshow('gframe', green_image)
-            cv2.imshow('jframe', _image)
-            #if cv2.waitKey(1) & 0xFF == ord('q'):
-            #    break
-
-        # When everything done, release the capture
-        self.cap.release()
-        cv2.destroyAllWindows()
-        '''

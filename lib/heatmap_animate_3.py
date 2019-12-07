@@ -5,15 +5,15 @@ import matplotlib.pyplot as plt
 
 class heatmap(object):
     def __init__(self):
-        self.vegetables = np.zeros[10]
-        self.farmers = np.zeros[10]
+        self.width = np.zeros[10]
+        self.length = np.zeros[10]
         self.harvest = np.zeros[10,10]
     
     def plot_test(self, subframe):
         self.harvest = subframe
                
-        self.vegetables = self.harvest.shape[0]
-        self.farmers = self.harvest.shape[1]
+        self.width = self.harvest.shape[0]
+        self.length = self.harvest.shape[1]
 
         fig, ax = plt.subplots()
         im = ax.imshow(harvest)

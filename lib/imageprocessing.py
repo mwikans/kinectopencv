@@ -18,6 +18,7 @@ class findFaceGetPulse(object):
         self.fps = -1
         self.frame_in = np.zeros((10, 10))
         self.frame_out = np.zeros((10, 10))
+        self.frame_jetmap = np.zeros((10, 10))
         self.gray = np.zeros((10, 10))
         self.forehead_ = np.zeros((10,10))
         self.green_forehead = np.zeros((10,10))
@@ -114,8 +115,8 @@ class findFaceGetPulse(object):
     def run(self):
         #self.frame_out = self.frame_in.copy()
         #tes = self.face_detection()    
-        #self.frame_out = self.frame_in.copy()
-        self.frame_out = cv2.applyColorMap(self.frame_in.copy(), cv2.COLORMAP_JET)
+        self.frame_out = self.frame_in.copy()
+        self.frame_jetmap = cv2.applyColorMap(self.frame_in.copy(), cv2.COLORMAP_JET)
         self.gray = cv2.equalizeHist(cv2.cvtColor(self.frame_in.copy(),
                                                   cv2.COLOR_BGR2GRAY))
         
@@ -125,9 +126,11 @@ class findFaceGetPulse(object):
                 self.frame_out, "Press 'S' to lock face and begin",
                        (10, 50), cv2.FONT_HERSHEY_PLAIN, 1.25, col)
             cv2.putText(self.frame_out, "Press 'F' to write to csv",
-                       (10, 60), cv2.FONT_HERSHEY_PLAIN, 1.25, col)
+                       (10, 65), cv2.FONT_HERSHEY_PLAIN, 1.25, col)
+            cv2.putText(self.frame_out, "Press 'M' to plot signal",
+                       (10, 80), cv2.FONT_HERSHEY_PLAIN, 1.25, col)
             cv2.putText(self.frame_out, "Press 'Esc' to quit",
-                       (10, 75), cv2.FONT_HERSHEY_PLAIN, 1.25, col)
+                       (10, 95), cv2.FONT_HERSHEY_PLAIN, 1.25, col)
         
         #tes2 = self.get_subface_coord(0.5, 0.13, 0.25, 0.15, tes)        
             detected = list(self.face_cascade.detectMultiScale(self.gray,
@@ -142,6 +145,7 @@ class findFaceGetPulse(object):
 
                 if self.shift(detected[-1]) > 10:
                     self.face_rect = detected[-1]
+                 
             forehead1 = self.get_subface_coord(0.5, 0.18, 0.25, 0.15)
             self.draw_rect(self.face_rect, col=(255, 0, 0))
             x, y, w, h = self.face_rect
