@@ -10,7 +10,7 @@ import time
 class getPulseApp(object):
     def __init__(self):
         self.cameras = []
-        self.selected_cam = 0
+        self.selected_cam = 1
         for i in range(3):
             camera = KinectRuntime(camera=i)  # first camera by default
             if camera.valid or not len(self.cameras):

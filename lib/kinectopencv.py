@@ -4,6 +4,8 @@ import cv2, time
 class KinectRuntime(object):
     def __init__(self, camera = 0):
         self.cap = cv2.VideoCapture(camera)
+        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
         self.valid = False
         try:
             resp = self.cap.read()

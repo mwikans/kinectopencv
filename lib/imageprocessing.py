@@ -56,7 +56,9 @@ class findFaceGetPulse(object):
     def draw_rect(self, rect, col=(0, 255, 0)):
         x, y, w, h = rect
         cv2.rectangle(self.frame_out, (x, y), (x + w, y + h), col, 1)
-    
+        cv2.rectangle(self.frame_jetmap, (x, y), (x + w, y + h), col, 1)
+        cv2.rectangle(self.gray, (x, y), (x + w, y + h), col, 1)
+        
     def RGB2GREEN(self, frame):
         green_image = frame
         green_image[:,:,0] = 0
@@ -155,10 +157,17 @@ class findFaceGetPulse(object):
             x, y, w, h = forehead1
             cv2.putText(self.frame_out, "Forehead",
                     (x, y), cv2.FONT_HERSHEY_PLAIN, 1.5, col)
+            cv2.putText(self.frame_jetmap, "Forehead",
+                    (x, y), cv2.FONT_HERSHEY_PLAIN, 1.5, col)
+            cv2.putText(self.gray, "Forehead",
+                    (x, y), cv2.FONT_HERSHEY_PLAIN, 1.5, col)
             self.forehead_ = self.RGB2GREEN(self.get_subface(forehead1))
             #self.forehead_ = self.downscale_img(self.forehead_)
             #self.green_forehead = self.forehead_[:, :, 1]
-            self.forehead_ = cv2.applyColorMap(self.downscale_img(self.forehead_), cv2.COLORMAP_JET)
+            
+            #self.forehead_ = cv2.applyColorMap(self.downscale_img(self.forehead_), cv2.COLORMAP_JET)
+            self.forehead_ = cv2.applyColorMap(self.forehead_, cv2.COLORMAP_JET)
+            
             self.averaging = self.get_subface_averaging(self.forehead_)
             self.fps += 1
         
