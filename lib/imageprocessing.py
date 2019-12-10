@@ -166,7 +166,7 @@ class findFaceGetPulse(object):
             #self.green_forehead = self.forehead_[:, :, 1]
             
             #self.forehead_ = cv2.applyColorMap(self.downscale_img(self.forehead_), cv2.COLORMAP_JET)
-            self.forehead_ = cv2.applyColorMap(self.forehead_, cv2.COLORMAP_JET)
+            #self.forehead_ = cv2.applyColorMap(self.forehead_, cv2.COLORMAP_JET)
             
             self.averaging = self.get_subface_averaging(self.forehead_)
             self.fps += 1

@@ -157,7 +157,7 @@ class getPulseApp(object):
         
         tes = self.image_processing.run()
         
-        #self.make_histogram_plot(forehead)
+        self.make_histogram_plot(forehead)
         #tes = self.image_processing.face_detection()
         #imshow("Input", frame)
         imshow("Interface", output_frame)
