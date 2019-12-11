@@ -39,9 +39,14 @@ replaced in the get_pulse.py application easily.
 def plot_histogram(subface_frame):
     fig, axes = plt.subplots()
     
-    axes.set_title("10x10 Pixel Compress")
+    axes.set_title("Pixel Downscaling")
+    
+    for i in range(subface_frame.shape[0]):
+        for j in range(subface_frame.shape[1]):
+            axes.text(j, i, subface_frame[i, j], ha="center", va="center", color="w")
     
     axes.imshow(subface_frame)
+    
     fig.canvas.draw()
     
     img = np.fromstring(fig.canvas.tostring_rgb(), dtype=np.uint8,

@@ -10,7 +10,7 @@ import time
 class getPulseApp(object):
     def __init__(self):
         self.cameras = []
-        self.selected_cam = 1
+        self.selected_cam = 0
         for i in range(3):
             camera = KinectRuntime(camera=i)  # first camera by default
             if camera.valid or not len(self.cameras):
@@ -165,7 +165,8 @@ class getPulseApp(object):
         imshow("Gray", output_gray)
         imshow("Forehead", forehead)
         #print(forehead)
-        #print(self.image_processing.forehead_)
+        print(forehead.shape[0])
+        print(forehead.shape[1])
         #print(self.image_processing.averaging)
         #print(self.image_processing.green_forehead)
         

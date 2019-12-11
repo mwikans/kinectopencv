@@ -135,12 +135,12 @@ class findFaceGetPulse(object):
                        (10, 95), cv2.FONT_HERSHEY_PLAIN, 1.25, col)
         
         #tes2 = self.get_subface_coord(0.5, 0.13, 0.25, 0.15, tes)        
-            detected = list(self.face_cascade.detectMultiScale(self.gray,
-                                                                scaleFactor=1.9,
-                                                                minNeighbors=5,
-                                                                minSize=(
-                                                                    50, 50),
-                                                                flags=cv2.CASCADE_SCALE_IMAGE))
+            detected = list(self.face_cascade.detectMultiScale(self.gray, 1.3, 5))
+           #                                                     scaleFactor=1.9,
+           #                                                     minNeighbors=5,
+           #                                                     minSize=(
+           #                                                         50, 50),
+           #                                                     flags=cv2.CASCADE_SCALE_IMAGE))
 
             if len(detected) > 0:
                 detected.sort(key=lambda a: a[-1] * a[-2])
@@ -162,7 +162,7 @@ class findFaceGetPulse(object):
             cv2.putText(self.gray, "Forehead",
                     (x, y), cv2.FONT_HERSHEY_PLAIN, 1.5, col)
             self.forehead_ = self.RGB2GREEN(self.get_subface(forehead1))
-            #self.forehead_ = self.downscale_img(self.forehead_)
+            self.forehead_ = self.downscale_img(self.forehead_)
             #self.green_forehead = self.forehead_[:, :, 1]
             
             #self.forehead_ = cv2.applyColorMap(self.downscale_img(self.forehead_), cv2.COLORMAP_JET)
