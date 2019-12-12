@@ -37,6 +37,7 @@ class getPulseApp(object):
 
         # Init parameters for the cardiac data plot
         self.bpm_plot = False
+        self.heatmap_plot = False
         self.plot_title = "Data display - raw signal (top) and PSD (bottom)"
         
         self.bandpass_filter = plotFilter()
@@ -45,7 +46,7 @@ class getPulseApp(object):
         # Maps keystrokes to specified methods
         #(A GUI window must have focus for these to work)
         self.key_controls = {"s": self.toggle_search,
-        #                     "d": self.toggle_display_plot,
+                             "d": self.toggle_histogram_plot,
         #                     "c": self.toggle_cam,
                              "f": self.toggle_write_csv,
                              "m": self.toggle_matplot}
@@ -106,9 +107,13 @@ class getPulseApp(object):
             self.fileOutput = open("_time_series_frame.csv","w")
             self.save_data = True
     
-    def make_histogram_plot(self, subface_frame):
-        plot_histogram(subface_frame)
-
+    def toggle_histogram_plot(self):#, subface_frame):
+        if self.heatmap_plot:
+            self.heatmap_plot = False
+            destroyWindow("plot")
+        else:
+            self.heatmap_plot = True
+            
     def toggle_matplot(self):
         """
         Toggle to show the time series signal.
@@ -156,8 +161,9 @@ class getPulseApp(object):
         forehead = self.image_processing.forehead_
         
         tes = self.image_processing.run()
+               
         
-        self.make_histogram_plot(forehead)
+        #self.toggle_histogram_plot(forehead)
         #tes = self.image_processing.face_detection()
         #imshow("Input", frame)
         imshow("Interface", output_frame)
@@ -165,18 +171,20 @@ class getPulseApp(object):
         imshow("Gray", output_gray)
         imshow("Forehead", forehead)
         #print(forehead)
-        print(forehead.shape[0])
-        print(forehead.shape[1])
         #print(self.image_processing.averaging)
         #print(self.image_processing.green_forehead)
         
         if self.save_data:
             self.write_csv()
-            
+         
+        if self.heatmap_plot:
+            plot_histogram(self.image_processing.forehead_)
+ 
         if self.bpm_plot:
             if self.save_data:
                 self.save_data = False
             self.bandpass_filter.run()
+            self.bpm_plot = False
                 
         self.key_handler()
 
