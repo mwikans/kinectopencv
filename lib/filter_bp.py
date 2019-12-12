@@ -25,7 +25,7 @@ class plotFilter(object):
 
     
     def run(self):
-        fs = 10.0
+        fs = 1/0.033
         lowcut = 0.10
         highcut = 2.0
 

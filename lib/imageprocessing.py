@@ -118,7 +118,7 @@ class findFaceGetPulse(object):
         #self.frame_out = self.frame_in.copy()
         #tes = self.face_detection()    
         self.frame_out = self.frame_in.copy()
-        self.frame_jetmap = cv2.applyColorMap(self.frame_in.copy(), cv2.COLORMAP_JET)
+        #self.frame_jetmap = cv2.applyColorMap(self.frame_in.copy(), cv2.COLORMAP_JET)
         self.gray = cv2.equalizeHist(cv2.cvtColor(self.frame_in.copy(),
                                                   cv2.COLOR_BGR2GRAY))
         

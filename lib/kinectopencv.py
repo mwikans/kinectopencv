@@ -14,9 +14,18 @@ class KinectRuntime(object):
         except:
             self.shape = None
 
+    def resize_image(self, frame):
+        height , width , layers =  frame.shape
+        new_h=round(height/3)
+        new_w=round(width/3)
+        resize = cv2.resize(frame, (new_w, new_h)) 
+        
+        return resize
+                
     def get_frame(self):
         if self.valid:
             _,frame = self.cap.read()
+            frame = self.resize_image(frame) 
         else:
             frame = np.ones((480,640,3), dtype=np.uint8)
             col = (0,256,256)

@@ -17,7 +17,7 @@ class getPulseApp(object):
                 self.cameras.append(camera)
             else:
                 break
-
+        
         self.w, self.h = 0, 0
         self.pressed = 0
         
@@ -81,6 +81,7 @@ class getPulseApp(object):
         #data = np.vstack((self.processor.times, self.processor.samples)).T
         #np.savetxt(fn + ".csv", data, delimiter=',')
         #print("Writing csv")
+        
         print("%.3f" % (sec), "%.3f" % self.image_processing.averaging)
 
     def toggle_search(self):
@@ -103,6 +104,7 @@ class getPulseApp(object):
             self.save_data = False
             self.fileOutput.close()
         else:
+            self.image_processing.fps = -1     
             print("Saving frame data buffer start")
             self.fileOutput = open("_time_series_frame.csv","w")
             self.save_data = True
@@ -135,7 +137,7 @@ class getPulseApp(object):
         if self.pressed == 27:  # exit program on 'esc'
             print("Exiting")
             for cam in self.cameras:
-                cam.cam.release()
+                cam.cap.release()
             #if self.send_serial:
             #    self.serial.close()
             sys.exit()
@@ -155,38 +157,50 @@ class getPulseApp(object):
         #self.processor.run(self.selected_cam)
         # collect the output frame for display
         output_frame = self.image_processing.frame_out
-        output_jetmap = self.image_processing.frame_jetmap
+        #output_jetmap = self.image_processing.frame_jetmap
         output_gray = self.image_processing.gray
         
-        forehead = self.image_processing.forehead_
-        
-        tes = self.image_processing.run()
-               
-        
-        #self.toggle_histogram_plot(forehead)
-        #tes = self.image_processing.face_detection()
-        #imshow("Input", frame)
         imshow("Interface", output_frame)
-        imshow("Jetmap", output_jetmap)
-        imshow("Gray", output_gray)
-        imshow("Forehead", forehead)
-        #print(forehead)
-        #print(self.image_processing.averaging)
-        #print(self.image_processing.green_forehead)
+        #imshow("Jetmap", output_jetmap)
+        imshow("Gray", output_gray)        
         
+        forehead = None
+        while forehead is None:
+            try:
+                forehead = self.image_processing.forehead_
+
+                tes = self.image_processing.run()
+                    
+                print(forehead)
+                #self.toggle_histogram_plot(forehead)
+                #tes = self.image_processing.face_detection()
+                #imshow("Input", frame)
+                #imshow("Interface", output_frame)
+                #imshow("Jetmap", output_jetmap)
+                #imshow("Gray", output_gray)
+                resizeWindow("tes", 400, 300) 
+                imshow("tes", forehead)
+                #print(forehead)
+                #print(self.image_processing.averaging)
+                #print(self.image_processing.green_forehead)
+            except:
+                pass
+
         if self.save_data:
             self.write_csv()
-         
+        
         if self.heatmap_plot:
             plot_histogram(self.image_processing.forehead_)
- 
+
         if self.bpm_plot:
             if self.save_data:
-                self.save_data = False
+                self.save_data = False 
             self.bandpass_filter.run()
             self.bpm_plot = False
                 
-        self.key_handler()
+        self.key_handler()        
+                    
+        
 
 if __name__ == "__main__":
     App = getPulseApp()
