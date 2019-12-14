@@ -25,7 +25,7 @@ class KinectRuntime(object):
     def get_frame(self):
         if self.valid:
             _,frame = self.cap.read()
-            frame = self.resize_image(frame) 
+            #frame = self.resize_image(frame) 
         else:
             frame = np.ones((480,640,3), dtype=np.uint8)
             col = (0,256,256)

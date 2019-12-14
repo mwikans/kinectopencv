@@ -171,14 +171,15 @@ class getPulseApp(object):
 
                 tes = self.image_processing.run()
                     
-                print(forehead)
+                #print(forehead)
                 #self.toggle_histogram_plot(forehead)
                 #tes = self.image_processing.face_detection()
                 #imshow("Input", frame)
                 #imshow("Interface", output_frame)
                 #imshow("Jetmap", output_jetmap)
                 #imshow("Gray", output_gray)
-                resizeWindow("tes", 400, 300) 
+                cv2.namedWindow("tes", cv2.WINDOW_NORMAL)        # Create window with freedom of dimensions
+                cv2.resizeWindow("tes", 400, 300)
                 imshow("tes", forehead)
                 #print(forehead)
                 #print(self.image_processing.averaging)

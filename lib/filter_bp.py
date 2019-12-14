@@ -1,6 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy import signal
 from scipy.signal import butter, lfilter, lfilter_zi
 import numpy as np
 
@@ -38,7 +39,10 @@ class plotFilter(object):
         x = data['y_value'].to_numpy()
 
         plt.figure(1)
-        plt.plot(n, x, label='ECG Signal')
+        plt.title('Raw Signal')
+        plt.ylabel('Amplitude')
+        plt.xlabel('Time [sec]')
+        plt.plot(n, x, label='Raw Signal')
         plt.grid(True)
 
         y = self.butter_bandpass_filter(x, lowcut, highcut, fs, order=2)
@@ -48,7 +52,10 @@ class plotFilter(object):
         print(y.shape)
 
         plt.figure(2)
-        plt.plot(n, y, label='ECG Signal')
+        plt.title('Filtered Signal')
+        plt.ylabel('c')
+        plt.xlabel('Time [sec]')
+        plt.plot(n, y, label='Filtered Signal')
         plt.grid(True)
         
         freq_response = np.abs(np.fft.fft(y))
@@ -56,6 +63,18 @@ class plotFilter(object):
         
         plt.figure(3)
         plt.plot(freq, freq_response, label='BPM FFT')
+        plt.title('FFT')
+        plt.ylabel('Power Spectrum')
+        plt.xlabel('Frequency [Hz]')
         plt.grid(True)
+
+        amp = 2 * np.sqrt(2)
+        f, t, Zxx = signal.stft(np.abs(y), fs, window="hann", nperseg=256)
         
+        plt.figure(4)
+        plt.pcolormesh(t, f, np.abs(Zxx), vmin=0, vmax=amp)
+        plt.grid(True)
+        plt.title('STFT Magnitude')
+        plt.ylabel('Frequency [Hz]')
+        plt.xlabel('Time [sec]')
         plt.show()
