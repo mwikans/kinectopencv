@@ -18,7 +18,7 @@ class KinectRuntime(object):
             self.shape = None
 
     def start(self):
-        Thread(target=self.get, args=()).start()
+        Thread(target=self.get_frame, args=()).start()
         return self
 
     def resize_image(self, frame):
@@ -29,35 +29,22 @@ class KinectRuntime(object):
         
         return resize
     
-    def get(self):
-        while not self.stopped:
-           if not self.grabbed:
-               self.stop()
-           else:
-               (self.grabbed, self.frame) = self.cap.read()
-                
-    """
     def get_frame(self):
         if self.valid:
-            video_getter = self.start()
-            #_,frame = self.cap.read()
-            #frame = self.resize_image(frame) 
-            while True:
-                if self.stopped:
+            while not self.stopped:
+                if not self.grabbed:
                     self.stop()
-                    break
-                _,frame = self.cap.read()
-            else:
-                frame = np.ones((480,640,3), dtype=np.uint8)
-                col = (0,256,256)
-                cv2.putText(frame, "(Error: Camera not accessible)",
+                else:
+                    (self.grabbed, self.frame) = self.cap.read()
+        else:
+            self.frame = np.ones((480,640,3), dtype=np.uint8)
+            col = (0,256,256)
+            cv2.putText(self.frame, "(Error: Camera not accessible)",
                         (65,220), cv2.FONT_HERSHEY_PLAIN, 2, col)
-        return frame
-    """    
         
     def release(self):
         self.cap.release()
-        self.stopped()
+        self.stop()
         
     def stop(self):
         self.stopped = True

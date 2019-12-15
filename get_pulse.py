@@ -2,6 +2,8 @@ from lib.kinectopencv import KinectRuntime
 from lib.interface import plot_histogram, imshow, waitKey, destroyWindow
 from lib.imageprocessing import findFaceGetPulse
 from lib.filter_bp import plotFilter
+from lib.threading_ok import MultiThreading
+from threading import Thread
 import cv2
 import numpy as np
 import sys
@@ -137,7 +139,7 @@ class getPulseApp(object):
         if self.pressed == 27:  # exit program on 'esc'
             print("Exiting")
             for cam in self.cameras:
-                self.cameras.release()
+                cam.release()
             #if self.send_serial:
             #    self.serial.close()
             sys.exit()
@@ -145,66 +147,65 @@ class getPulseApp(object):
         for key in self.key_controls.keys():
             if chr(self.pressed) == key:
                 self.key_controls[key]()
-
+    
     def main_loop(self):
-        video_getter = KinectRuntime(self.selected_cam).start()
+        frame_getter =  self.cameras[self.selected_cam].start()
         
-        while True:
-            frame = video_getter.frame
+        #while True:
+        #frame = video_getter.frame
+                
+        #self.h, self.w, _c = output_frame.shape
+
+        #frame_processing = frame.copy()
+        # set current image frame to the processor's input
+        self.image_processing.frame_in = frame_getter.frame
+        # process the image frame to perform all needed analysis
+        #self.processor.run(self.selected_cam)
+        # collect the output frame for display
+        output_frame = self.image_processing.frame_out
+        #output_jetmap = self.image_processing.frame_jetmap
+        output_gray = self.image_processing.gray
+        
+        imshow("Interface", output_frame)
+        #imshow("Jetmap", output_jetmap)
+        imshow("Gray", output_gray)        
+        
+        forehead = None
+        while forehead is None:
+            try:
+                forehead = self.image_processing.forehead_
+
+                tes = self.image_processing.run()
                     
-            #frame = self.cameras[self.selected_cam].get_frame()
-            #self.h, self.w, _c = output_frame.shape
+                #print(forehead)
+                #self.toggle_histogram_plot(forehead)
+                #tes = self.image_processing.face_detection()
+                #imshow("Input", frame)
+                #imshow("Interface", output_frame)
+                #imshow("Jetmap", output_jetmap)
+                #imshow("Gray", output_gray)
+                cv2.namedWindow("tes", cv2.WINDOW_NORMAL)        # Create window with freedom of dimensions
+                cv2.resizeWindow("tes", 400, 300)
+                imshow("tes", forehead)
+                #print(forehead)
+                #print(self.image_processing.averaging)
+                #print(self.image_processing.green_forehead)
+            except:
+                pass
 
-            #frame_processing = frame.copy()
-            # set current image frame to the processor's input
-            self.image_processing.frame_in = frame
-            # process the image frame to perform all needed analysis
-            #self.processor.run(self.selected_cam)
-            # collect the output frame for display
-            output_frame = self.image_processing.frame_out
-            #output_jetmap = self.image_processing.frame_jetmap
-            output_gray = self.image_processing.gray
-            
-            imshow("Interface", output_frame)
-            #imshow("Jetmap", output_jetmap)
-            imshow("Gray", output_gray)        
-            
-            forehead = None
-            while forehead is None:
-                try:
-                    forehead = self.image_processing.forehead_
+        if self.save_data:
+            self.write_csv()
+        
+        if self.heatmap_plot:
+            plot_histogram(self.image_processing.forehead_)
 
-                    tes = self.image_processing.run()
-                        
-                    #print(forehead)
-                    #self.toggle_histogram_plot(forehead)
-                    #tes = self.image_processing.face_detection()
-                    #imshow("Input", frame)
-                    #imshow("Interface", output_frame)
-                    #imshow("Jetmap", output_jetmap)
-                    #imshow("Gray", output_gray)
-                    cv2.namedWindow("tes", cv2.WINDOW_NORMAL)        # Create window with freedom of dimensions
-                    cv2.resizeWindow("tes", 400, 300)
-                    imshow("tes", forehead)
-                    #print(forehead)
-                    #print(self.image_processing.averaging)
-                    #print(self.image_processing.green_forehead)
-                except:
-                    pass
-
+        if self.bpm_plot:
             if self.save_data:
-                self.write_csv()
-            
-            if self.heatmap_plot:
-                plot_histogram(self.image_processing.forehead_)
-
-            if self.bpm_plot:
-                if self.save_data:
-                    self.save_data = False 
-                self.bandpass_filter.run()
-                self.bpm_plot = False
-                    
-            self.key_handler()        
+                self.save_data = False 
+            self.bandpass_filter.run()
+            self.bpm_plot = False
+                
+        self.key_handler()        
                         
         
 
